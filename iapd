@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'sqlite3'
+require 'csv'
+
+def search_sql(search_term)
+  fields = ['FilingID', '1A', '1D']
+  where = "\"1A\" LIKE '\%#{search_term.upcase}\%'"
+  select = fields.map { |x| "\"#{x}\"" }.join(', ')
+  table = 'IA_ADV_Base_A_20180401_20180630'
+  "SELECT #{select} FROM #{table} WHERE #{where}"
+end
+
+def schedule_a_sql(filing_id)
+  "SELECT * FROM IA_Schedule_A_B_20180401_20180630 WHERE FilingID = #{filing_id}"
+end
+
+
+def run(sql)
+  SQLite3::Database
+    .new('iapd.db')
+    .execute(sql)
+    .each { |row| puts row.to_csv }
+end
+
+case ARGV[0]&.downcase
+when 'search'
+  run search_sql(ARGV[1])
+when 'a', 'schedulea'
+  run schedule_a_sql(ARGV[1])
+else
+  raise 'unknown command'
+end
+
+
+
+
+# db.execute(sql).each { |row| puts row.to_csv }
