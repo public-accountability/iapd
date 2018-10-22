@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+max_procs=2
+data_folder=data
+zip_file=form-adv-complete-ria.zip
+
+mkdir -p $data_folder
+
+iapd_files() {
+    zipinfo -1 $zip_file | egrep 'IA_Schedule_A_B|IA_ADV_Base_A'
+}
+
+# extract files into 'data'
+iapd_files | xargs -P $max_procs -I FILE sh -c 'bin/extract-file-to-dir "FILE"'
+
+# build database
+find $data_folder -type f -name '*.csv' -print0 |
+    xargs -0 -P $max_procs -I CSV bin/insert-csv CSV

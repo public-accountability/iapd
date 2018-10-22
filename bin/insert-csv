@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+
+file_path="$1"
+database=iapd.db
+
+csvsql --db "sqlite:///$database" --insert "$file_path"
