@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+date_range=$1
+
+zipinfo -1 form-adv-complete-ria.zip "*$date_range*.csv" |
+    egrep 'IA_Schedule_A_B|IA_ADV_Base_A' |
+    xargs -I FILE bin/extract-file "FILE"

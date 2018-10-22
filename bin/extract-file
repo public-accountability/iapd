@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+full_file_path="$1"
+file_name=$(echo "$full_file_path" | ruby -n -e 'print $_.split("/")[1]')
+
+echo $file_name
+unzip -p form-adv-complete-ria.zip "$full_file_path" > "$file_name"

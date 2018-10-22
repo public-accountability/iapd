@@ -1,0 +1,5 @@
+#!/bin/sh
+
+zipinfo -1 form-adv-complete-ria.zip |
+    egrep -o '2018[0-9]+_[0-9]+' |
+    sort --unique --numeric-sort --reverse
