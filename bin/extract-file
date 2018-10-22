@@ -4,5 +4,4 @@ set -eu
 full_file_path="$1"
 file_name=$(echo "$full_file_path" | ruby -n -e 'print $_.split("/")[1]')
 
-echo $file_name
-unzip -p form-adv-complete-ria.zip "$full_file_path" > "$file_name"
+unzip -p form-adv-complete-ria.zip "$full_file_path" | iconv -c -f ISO-8859-1 -t UTF-8 - > "$file_name"
