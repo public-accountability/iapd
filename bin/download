@@ -1,0 +1,3 @@
+#!/bin/sh
+
+curl -# -L https://www.sec.gov/foia/docs/adv/form-adv-complete-ria.zip > form-adv-complete-ria.zip
