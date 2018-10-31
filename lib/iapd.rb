@@ -6,8 +6,9 @@ require 'csv'
 require 'date'
 require 'sqlite3'
 
-require "iapd/version"
-require "iapd/database"
+require 'iapd/version'
+require 'iapd/database'
+require 'iapd/advisors'
 
 # module Iapd
 # end
