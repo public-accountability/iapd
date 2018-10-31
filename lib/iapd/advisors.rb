@@ -1,22 +1,27 @@
 # frozen_string_literal: true
 
 module Iapd
-  class Advisors < SimpleDelegator
-
-    def save_to_csv(file_path = './advisors.csv')
+  module Advisors
+    def advisors
       sec_numbers = Set.new
+      rows = []
 
-      File.open(file_path, 'w') do |f|
-        f.write %w[name sec_file_number crd_number table].to_csv
-
-        base_a_tables.each do |table|
-          execute(advisor_sql(table)).each do |row|
-            unless sec_numbers.include? row[1]
-              sec_numbers << row[1]
-              f.write row.insert(3, table).to_csv
-            end
+      base_a_tables.each do |table|
+        execute(advisor_sql(table)).each do |row|
+          unless sec_numbers.include? row[1]
+            sec_numbers << row[1]
+            rows << row.insert(3, table)
           end
         end
+      end
+
+      rows
+    end
+    
+    def save_advisors_to_csv(file_path = './advisors.csv')
+      File.open(file_path, 'w') do |f|
+        f.write %w[name sec_file_number crd_number table].to_csv
+        advisors.each { |row| f.write row.to_csv }
       end
     end
 

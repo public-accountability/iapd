@@ -7,8 +7,9 @@ require 'date'
 require 'sqlite3'
 
 require 'iapd/version'
-require 'iapd/database'
 require 'iapd/advisors'
+require 'iapd/database'
+
 
 # module Iapd
 # end

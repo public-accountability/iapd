@@ -3,8 +3,9 @@
 module Iapd
   class Database
     attr_reader :db
-
     delegate :execute, to: :@db
+
+    include Iapd::Advisors
 
     def initialize(database = 'iapd.db')
       @db = SQLite3::Database.new(database)
@@ -15,16 +16,9 @@ module Iapd
     end
 
     def base_a_tables
-      tables
-        .select { |t| t.include? 'ADV_Base_A' }
-        .sort
-        .reverse
+      tables.select { |t| t.include? 'ADV_Base_A' }.sort.reverse
     end
 
-    def advisors
-      @advisors ||= Iapd::Advisors.new(self)
-    end
-    
     # 'IA_ADV_Base_A_20171001_20171231'
   end
 end
