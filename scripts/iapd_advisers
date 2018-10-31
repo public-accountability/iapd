@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+require_relative 'iapd.rb'
+
+create_table_sql = <<SQL
+
+DROP TABLE IF EXISTS iapd_advisers;
+
+CREATE TABLE iapd_advisers (
+   tables TEXT,
+   sec_file_number TEXT UNIQUE,
+   crd_number TEXT UNIQUE
+);
+
+SQL
+
+IAPD.execute create_table_sql
+
+IAPD.tables.select { |t| t.include? 'ADV_Base_A' }.each do |table|
+
+  IPAD.advisors_in_table(table).each do |row|
+    if 
+    
+  end
+
+  
+end

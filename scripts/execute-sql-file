@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+sql_file="$1"
+database=iapd.db
+
+if ! test -f "$sql_file"
+then
+    echo "${sql_file} is not a file" >&2
+    exit 1
+fi
+
+sqlite3 -csv -header "$database" < "$sql_file"
