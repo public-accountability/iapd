@@ -6,7 +6,7 @@ module Iapd
     SORT_BY_RECENT_SUBMISSION_DATE = ->(a, b) { Date.parse(b.fetch('DateSubmitted')) <=> Date.parse(a.fetch('DateSubmitted')) }
 
     # Generate an array of all advisors across all Base_A Tables
-    # Many adivisors will have entries in many tables, but this
+    # Many advisors will have entries in many tables, but this
     # will only include the most recent table.
     # 
     # columns: name, sec_file_number, crd_number, table
@@ -25,7 +25,7 @@ module Iapd
 
       rows
     end
-    
+
     def advisor_by_sec_file_number(sec_file_number)
       base_a_tables.each do |table|
         rows = execute(search_by_file_number_sql(sec_file_number, table))

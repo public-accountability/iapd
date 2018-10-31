@@ -3,7 +3,7 @@
 module Iapd
   module Owners
     REMOVE_INT_PAIRS = ->(h) { h.delete_if { |k, _| k.is_a?(Integer) } }
-    
+
     def owners(sec_file_number)
       advisor = advisor_by_sec_file_number(sec_file_number)
       filing_id = advisor.fetch "FilingID"
