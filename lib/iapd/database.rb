@@ -5,20 +5,13 @@ module Iapd
     attr_reader :db
     delegate :execute, to: :@db
 
+    include Iapd::Tables
     include Iapd::Advisors
-
+    include Iapd::Owners
+    
     def initialize(database = 'iapd.db')
       @db = SQLite3::Database.new(database)
+      @db.results_as_hash = true
     end
-
-    def tables
-      execute("SELECT name FROM sqlite_master WHERE type='table'").flatten
-    end
-
-    def base_a_tables
-      tables.select { |t| t.include? 'ADV_Base_A' }.sort.reverse
-    end
-
-    # 'IA_ADV_Base_A_20171001_20171231'
   end
 end
