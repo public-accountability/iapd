@@ -9,8 +9,8 @@ module Iapd
       end
     end
 
-    def json
-      advisors.map do |advisor|
+    def json(filter = nil)
+      advisors(filter).map do |advisor|
         the_owners = owners(advisor['sec_file_number'])
         advisor.merge('owners' => the_owners)
       end

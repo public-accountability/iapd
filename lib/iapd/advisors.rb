@@ -6,15 +6,24 @@ module Iapd
     EXTRACT_DATE = ->(h) { Date.parse(h.fetch('DateSubmitted')) }
     SORT_BY_RECENT_SUBMISSION_DATE = ->(a, b) { EXTRACT_DATE.call(b) <=> EXTRACT_DATE.call(a) }
 
+    # You can use this to help filter the advisors by assets.
+    # For instance to get all advisors with assets over $1 billion:
+    #
+    #   advisors(ASSETS_FILTER.curry[1_000_000_000])
+    #
+    ASSETS_FILTER = proc do |amount, h|
+      h['assets_under_management'] && h['assets_under_management'] > amount
+    end
+
     # Generate an array of all advisors across all Base_A Tables
     # Many advisors will have entries in many tables, but this
     # will only include the most recent table.
-    def advisors
+    def advisors(filter = nil)
       sec_numbers = Set.new
       rows = []
 
       base_a_tables.each do |table|
-        execute(advisor_sql(table)).each do |row|
+        execute(advisor_sql(table)).select(&filter).each do |row|
           unless sec_numbers.include? row['sec_file_number']
             sec_numbers << row['sec_file_number']
             rows << add_table_and_remove_int_pairs(table, row)
