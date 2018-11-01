@@ -69,7 +69,9 @@ module Iapd
       <<-SQL
       SELECT `1A` as name,
              `1D` as sec_file_number,
-             `#{crd_col}` as crd_number
+             `#{crd_col}` as crd_number,
+             `5F2C` as assets_under_management,
+             `5F2F` as total_number_of_accounts
       FROM #{table}
       SQL
     end
