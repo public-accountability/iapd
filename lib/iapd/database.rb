@@ -8,10 +8,13 @@ module Iapd
     include Iapd::Tables
     include Iapd::Advisors
     include Iapd::Owners
-    
+
     def initialize(database = 'iapd.db')
       @db = SQLite3::Database.new(database)
       @db.results_as_hash = true
+    end
+
+    def json
     end
   end
 end

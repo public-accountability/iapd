@@ -6,7 +6,7 @@ module Iapd
 
     def owners(sec_file_number)
       advisor = advisor_by_sec_file_number(sec_file_number)
-      filing_id = advisor.fetch "FilingID"
+      filing_id = advisor.fetch 'FilingID'
       table = base_a_to_schedule advisor.fetch('table')
 
       execute(owners_sql(filing_id, table)).map(&REMOVE_INT_PAIRS)
