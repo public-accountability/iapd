@@ -12,8 +12,8 @@ iapd_files() {
 }
 
 # extract files into 'data'
-iapd_files | xargs -P $max_procs -I FILE sh -c 'bin/extract-file-to-dir "FILE"'
+iapd_files | xargs -P $max_procs -I FILE sh -c 'scripts/extract-file-to-dir "FILE"'
 
 # build database
 find $data_folder -type f -name '*.csv' -print0 |
-    xargs -0 -P $max_procs -I CSV bin/insert-csv CSV
+    xargs -0 -P $max_procs -I CSV scripts/insert-csv CSV

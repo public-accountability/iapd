@@ -9,4 +9,4 @@ destination_folder=${2:-data}
 file_name=$(echo "$full_file_path" | ruby -n -e 'print $_.split("/")[1]')
 destination_file_path="$(readlink -f $destination_folder)/$file_name"
 
-bin/extract-file "$full_file_path" > "$destination_file_path"
+scripts/extract-file "$full_file_path" > "$destination_file_path"
