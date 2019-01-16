@@ -5,8 +5,6 @@ max_procs=2
 data_folder=data
 zip_file=form-adv-complete-ria.zip
 
-mkdir -p $data_folder
-
 iapd_files() {
     zipinfo -1 $zip_file | egrep 'IA_Schedule_A_B|IA_ADV_Base_A'
 }
