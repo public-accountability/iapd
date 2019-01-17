@@ -21,6 +21,24 @@ task :companies_over_10_billion do
   end
 end
 
+desc 'top 200 advisors'
+task :top_200 do
+  top_200 = Iapd::Database.new
+              .json(Iapd::Advisors::ASSETS_FILTER.curry[1_000_000_000])
+              .sort_by { |x| x['assets_under_management'] }
+              .reverse
+              .take(200)
+    
+  File.open('top_200.json', 'w') do |f|
+    f.write JSON.pretty_generate(top_200)
+  end
+end
+
+desc 'creates json of all iapd advisors'
+file 'advisors.json' do |t|
+  Iapd::Database.new.save_json_to_file(t.name)
+end
+
 desc 'downloads form adv complete zip file'
 task download: ['form-adv-complete-ria.zip']
 
