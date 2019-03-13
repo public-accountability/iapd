@@ -4,13 +4,13 @@ require 'pry'
 require 'csv'
 require 'zip'
 
+
 ZIP_FILE = './form-adv-complete-ria.zip'
 ADVISORS_FILE = './advisors.csv'
 OWNERS_FILE = './owners.csv'
 
 BASE_A_FILTER = proc { |x| /IA_ADV_Base_A/.match? x.name }
 SCHEDULE_A_B_FILTER = proc { |x| /IA_Schedule_A_B/.match? x.name }
-
 
 # Used to find quotes insides of quotes that need to be doubled quoted but are not
 # examples:
@@ -20,21 +20,26 @@ SCHEDULE_A_B_FILTER = proc { |x| /IA_Schedule_A_B/.match? x.name }
 #    "foo "bar" baz"
 QUOTE_ALONE = /(?<=[^",]{1})(")(?=[^",]{1})/
 TWO_QUOTES_AT_START = /((?<=\A)|(?<=[[:alnum:]]{1},))("{2})(?=[^",]{1})/
-TWO_QUOTES_AT_END = /(?<=[^",]{1})("{2})(?=\Z|,[[:alnum:]]+?)/
+TWO_QUOTES_AT_END = /(?<=[^",]{1})("{2})(?=\Z|,[^ ]{1})/
+COLUMN_IN_QUOTES = /(,"")([^"]+)("",)/
+
+# DOUBLE_QUOTE_START = /(?<=[^"]{2}),""/
+# DOUBLE_QUOTE_END = /(?<=[^,]{1})"",/
 
 TWO_QUOTES = '""'
 THREE_QUOTES = '"""'
 
 def quote(str)
   str
+    .gsub(COLUMN_IN_QUOTES, ',"""\2""",')
     .gsub(QUOTE_ALONE, TWO_QUOTES)
     .gsub(TWO_QUOTES_AT_START, THREE_QUOTES)
     .gsub(TWO_QUOTES_AT_END, THREE_QUOTES)
 end
 
-# There are a bewlindering number of headers, all with cryptic names
-# These are a conversation chart with human-understandable version of
-# fields we care about.
+# There are a bewildering number of headers, all with cryptic names.
+# These maps are used to select which fields we care about, and give them
+# human-understandable titles
 ADVISORS_HEADER_MAP = {
   '1A' => 'name',
   '1B' => 'dba_name',
@@ -72,6 +77,7 @@ def normalize(line)
           .force_encoding(Encoding::ISO_8859_1)
           .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '')
           .strip
+  # puts quote(l)
   quote(l)
 end
 
@@ -114,3 +120,7 @@ Zip::File.open(ZIP_FILE) do |zip_file|
   advisors zip_file
   owners zip_file
 end
+
+
+
+
