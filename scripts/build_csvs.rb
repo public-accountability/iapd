@@ -11,6 +11,7 @@ OWNERS_FILE = './owners.csv'
 
 BASE_A_FILTER = proc { |x| /IA_ADV_Base_A/.match? x.name }
 SCHEDULE_A_B_FILTER = proc { |x| /IA_Schedule_A_B/.match? x.name }
+AFTER_2016 = proc { |x| /_(2017|2018|2019|2020|2021)/.match? x.name }
 
 # Used to find quotes insides of quotes that need to be doubled quoted but are not
 # examples:
@@ -22,6 +23,7 @@ QUOTE_ALONE = /(?<=[^",]{1})(")(?=[^",]{1})/
 TWO_QUOTES_AT_START = /((?<=\A)|(?<=[[:alnum:]]{1},))("{2})(?=[^",]{1})/
 TWO_QUOTES_AT_END = /(?<=[^",]{1})("{2})(?=\Z|,[^ ]{1})/
 COLUMN_IN_QUOTES = /(,"")([^"]+)("",)/
+BLANK_COLUMN = /(?<=,)""(?=,)/
 
 # DOUBLE_QUOTE_START = /(?<=[^"]{2}),""/
 # DOUBLE_QUOTE_END = /(?<=[^,]{1})"",/
@@ -31,6 +33,8 @@ THREE_QUOTES = '"""'
 
 def quote(str)
   str
+    .gsub('|', '')
+    .gsub(BLANK_COLUMN, '')
     .gsub(COLUMN_IN_QUOTES, ',"""\2""",')
     .gsub(QUOTE_ALONE, TWO_QUOTES)
     .gsub(TWO_QUOTES_AT_START, THREE_QUOTES)
@@ -42,31 +46,32 @@ end
 # human-understandable titles
 ADVISORS_HEADER_MAP = {
   '1A' => 'name',
+  # Annoyingly, some years use a different code for these fields
   '1B' => 'dba_name',
-  '1C-Legal' => 'umbrella',
-  # Annoyingly, some years use a different code for this field
-  '1E1' => 'crd_number',
+  '1B1' => 'dba_name',
   '1E' => 'crd_number',
+  '1E1' => 'crd_number',
+  
   '1D' => 'sec_file_number',
   '5F2C' => 'assets_under_management',
   '5F2F' => 'total_number_of_accounts',
-  'FilingId' => 'filing_id',
-  'DateSubmitted' => 'date_submitted'
+  'FILINGID' => 'filing_id',
+  'DATESUBMITTED' => 'date_submitted'
 }
 
 OWNERS_HEADER_MAP = {
-  'FilingID' => 'filing_id',
-  'SchA-3' => 'scha_3',
-  'Schedule' => 'schedule',
-  'Full Legal Name' => 'name',
+  'FILINGID' => 'filing_id',
+  'SCHA-3' => 'scha_3',
+  'SCHEDULE' => 'schedule',
+  'FULL LEGAL NAME' => 'name',
   "DE/FE/I" => 'owner_type',
-  'Entity in Which' => 'entity_in_which',
-  "Title or Status" => 'title_or_status',
-  'Status Acquired' => 'acquired',
-  'Ownership Code' => 'ownership_code',
-  'Control Person' => 'control_person',
+  'ENTITY IN WHICH' => 'entity_in_which',
+  "TITLE OR STATUS" => 'title_or_status',
+  'STATUS ACQUIRED' => 'acquired',
+  'OWNERSHIP CODE' => 'ownership_code',
+  'CONTROL PERSON' => 'control_person',
   'PR' => 'public_reporting',
-  'OwnerID' => 'owner_id'
+  'OWNERID' => 'owner_id'
 }
 
 # Oh encoding issues; they never seem to away.
@@ -85,18 +90,30 @@ def parse_file(zip_file, out_file:, headers_map:, filter:)
   CSV.open(out_file, 'wb',  col_sep: '|') do |csv|
     csv << (headers_map.values.uniq + ['filename'])
 
-    zip_file.entries.filter(&filter).each do |entry|
+    zip_file.entries.filter(&AFTER_2016).filter(&filter).each do |entry|
       filename = entry.name.split('/').last
       puts "Processing: #{filename}"
       stream = entry.get_input_stream
       headers = CSV.parse_line(stream.readline.strip)
+      
+      col_count = headers_map.values.uniq.length + 1
+
+      has_assets = headers_map.keys.include?('5F2C')
 
       stream.each_line do |line|
-        csv << CSV.parse_line(normalize(line), headers: headers)
-                 .to_h
-                 .slice(*headers_map.keys)
-                 .merge('filename' => filename)
-                 .values
+        parsed_line = CSV.parse_line(normalize(line), headers: headers)
+        values = parsed_line
+                   .to_h
+                   .transform_keys(&:upcase)
+                   .slice(*headers_map.keys)
+                   .merge('filename' => filename)
+                   .values
+
+        if values.count != col_count
+          binding.pry
+        else
+          csv << values
+        end
       end
     end
   end
