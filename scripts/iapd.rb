@@ -8,19 +8,33 @@ require 'sqlite3'
 
 module IAPD
   DB_FILE = 'iapd.db'
+  BUSY_TIMEOUT = 500
 
   CRD = /\A[[:digit:]]+\Z/
   TAX = /\A[[:digit:]]{2}-{1}[[:digit:]]+\Z/
 
+  # DB FUNCTIONS
   def self.database
-    SQLite3::Database.new(DB_FILE, results_as_hash: true)
+    db = SQLite3::Database.new(DB_FILE, results_as_hash: true)
+    db.busy_timeout = BUSY_TIMEOUT
+    db
   end
 
   def self.with_database
     SQLite3::Database.new(DB_FILE, results_as_hash: true) do |db|
+      db.busy_timeout = BUSY_TIMEOUT
       yield db
     end
   end
+
+  def self.execute(sql, bindings = [])
+    db = database
+    result = db.execute(sql, bindings)
+    db.close
+    result
+  end
+
+  # various helper functions
 
   def self.to_dt(str)
     DateTime.strptime str, '%m/%d/%Y %I:%M:%S %p'

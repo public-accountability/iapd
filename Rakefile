@@ -27,7 +27,7 @@ end
 
 desc 'adds column owner_key and advisor_crd_number to owners table'
 task :update_owners_table do
-  ruby './scripts/owner_key.rb'
+  ruby './scripts/update_owners_table.rb'
 end
 
 # directory 'data'
