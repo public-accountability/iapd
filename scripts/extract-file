@@ -1,4 +1,0 @@
-#!/bin/sh
-set -eu
-
-unzip -p form-adv-complete-ria.zip "$1" | iconv -c -f ISO-8859-1 -t UTF-8

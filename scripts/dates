@@ -1,5 +1,0 @@
-#!/bin/sh
-
-sqlite3 iapd.db "select name from sqlite_master where type='table'" |
-    egrep -o '[0-9]+_[0-9]+' |
-    sort --unique --numeric-sort --reverse
