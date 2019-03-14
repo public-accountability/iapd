@@ -20,6 +20,16 @@ file 'iapd.db' do
   sh "sqlite3 iapd.db < ./scripts/iapd.sql"
 end
 
+desc 'creates advisors.json and owners.json'
+task :json do
+  ruby './scripts/build_json.rb'
+end
+
+desc 'adds column owner_key and advisor_crd_number to owners table'
+task :update_owners_table do
+  ruby './scripts/owner_key.rb'
+end
+
 # directory 'data'
 
 # require 'bundler/gem_tasks'
