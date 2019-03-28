@@ -25,6 +25,11 @@ task :json do
   ruby './scripts/build_json.rb'
 end
 
+desc 'creates relationships.csv'
+task :relationships do
+  ruby './scripts/relationships_csv.rb'
+end
+
 desc 'adds column owner_key and advisor_crd_number to owners table'
 task :update_owners_table do
   ruby './scripts/update_owners_table.rb'

@@ -4,10 +4,13 @@ To build the sqlite3 database:
 
 ``` shell
 rake download
-rake iapd.db
+rake csvs
+rake database
+rake update_owners_table
+rake json
+rake relationships
 ```
 
-These require having `csvkit` installed
 
 ## Installation
 

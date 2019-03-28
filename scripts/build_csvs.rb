@@ -51,7 +51,7 @@ ADVISORS_HEADER_MAP = {
   '1B1' => 'dba_name',
   '1E' => 'crd_number',
   '1E1' => 'crd_number',
-  
+
   '1D' => 'sec_file_number',
   '5F2C' => 'assets_under_management',
   '5F2F' => 'total_number_of_accounts',
@@ -82,7 +82,6 @@ def normalize(line)
           .force_encoding(Encoding::ISO_8859_1)
           .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '')
           .strip
-  # puts quote(l)
   quote(l)
 end
 
@@ -93,12 +92,11 @@ def parse_file(zip_file, out_file:, headers_map:, filter:)
     zip_file.entries.filter(&AFTER_2016).filter(&filter).each do |entry|
       filename = entry.name.split('/').last
       puts "Processing: #{filename}"
+
       stream = entry.get_input_stream
       headers = CSV.parse_line(stream.readline.strip)
       
       col_count = headers_map.values.uniq.length + 1
-
-      has_assets = headers_map.keys.include?('5F2C')
 
       stream.each_line do |line|
         parsed_line = CSV.parse_line(normalize(line), headers: headers)
@@ -137,7 +135,3 @@ Zip::File.open(ZIP_FILE) do |zip_file|
   advisors zip_file
   owners zip_file
 end
-
-
-
-
