@@ -31,7 +31,7 @@ ADVISORS.each do |crd_number, data|
 
   owner_keys.each do |owner_key|
     row = [
-      acrd_number,
+      crd_number,
       data.first['name'],
       owner_key,
       OWNERS[owner_key].first['name']
