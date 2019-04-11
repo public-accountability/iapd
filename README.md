@@ -1,42 +1,39 @@
-# Iapd
-
-To build the sqlite3 database:
+# IAPD
 
 ``` shell
 rake download
+```
+
+Downloads SEC zip data. Creates file "form-adv-complete-ria.zip"
+
+``` shell
 rake csvs
+```
+
+Produces two csv -- advisors.csv and owners.csv -- from the zip file
+
+``` shell
 rake database
+```
+
+Creates "iapd.db", a sqlite database with 2 tables, advisors and owners, containing the information from the csvs.
+
+``` shell
 rake update_owners_table
+```
+
+Computes two new columns to the owners table: owner_key and advisor_crd_number.
+
+``` shell
 rake json
+```
+
+Creates advisors.json and owners.json. In advisors.json the key is the "crd" number and the values is an array of all advisors found with the same crd number. For owner.json the key is either the name or the crd number of the owner and values is an array of all owner that are the same.
+
+``` shell
 rake relationships
 ```
-
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'iapd'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install iapd
-
-## Usage
-
-
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Produces relationships.csv, an list of ownership relationship.
 
 
 ### about the data

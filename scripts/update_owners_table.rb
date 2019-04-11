@@ -15,16 +15,19 @@ create_column "advisor_crd_number", "INTEGER"
 update_sql = 'UPDATE owners SET owner_key = ?, advisor_crd_number = ?  WHERE rowid = ?'
 filings_id_sql = "SELECT group_concat(filing_id) as filing_ids, crd_number from advisors group by crd_number"
 
+# Map between filing id and crd_number
 crd_number_lookup = IAPD.execute(filings_id_sql).each_with_object({}) do |row, h|
   row['filing_ids'].split(',').each do |filing_id|
     h.store filing_id, row['crd_number']
   end
 end
 
-
-
 IAPD.with_database do |db|
   db.execute("SELECT *, rowid FROM owners").each do |row|
-    db.execute update_sql, [IAPD.owner_key(row), row['rowid']]
+    values = [IAPD.owner_key(row),
+              crd_number_lookup[row['filing_id'].to_s],
+              row['rowid']]
+
+    db.execute update_sql, values
   end
 end

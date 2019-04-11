@@ -20,6 +20,11 @@ file 'iapd.db' do
   sh "sqlite3 iapd.db < ./scripts/iapd.sql"
 end
 
+desc 'adds column owner_key and advisor_crd_number to owners table'
+task :update_owners_table do
+  ruby './scripts/update_owners_table.rb'
+end
+
 desc 'creates advisors.json and owners.json'
 task :json do
   ruby './scripts/build_json.rb'
@@ -30,47 +35,7 @@ task :relationships do
   ruby './scripts/relationships_csv.rb'
 end
 
-desc 'adds column owner_key and advisor_crd_number to owners table'
-task :update_owners_table do
-  ruby './scripts/update_owners_table.rb'
+desc 'Remove all csv and json files'
+task :clean do
+  rm %w[csv json db].map { |x| Dir.glob("*.#{x}") }.reduce(:+)
 end
-
-# directory 'data'
-
-# require 'bundler/gem_tasks'
-# require 'bundler/setup'
-# require 'rspec/core/rake_task'
-# require 'iapd'
-
-# RSpec::Core::RakeTask.new(:spec)
-
-# ADV_ZIP_FILE = './form-adv-complete-ria.zip'
-
-# desc 'save json over all companies with more than $10 billion in assets'
-# task :companies_over_10_billion do
-#   iapd = Iapd::Database.new
-#   filter = Iapd::Advisors::ASSETS_FILTER.curry[10_000_000_000]
-
-#   File.open('companies_over_10_billion.json', 'w') do |f|
-#     f.write JSON.pretty_generate(iapd.json(filter))
-#   end
-# end
-
-# desc 'top 200 advisors'
-# task :top_200 do
-#   top_200 = Iapd::Database.new
-#               .json(Iapd::Advisors::ASSETS_FILTER.curry[1_000_000_000])
-#               .sort_by { |x| x['assets_under_management'] }
-#               .reverse
-#               .take(200)
-    
-#   File.open('top_200.json', 'w') do |f|
-#     f.write JSON.pretty_generate(top_200)
-#   end
-# end
-
-# desc 'creates json of all iapd advisors'
-# file 'advisors.json' do |t|
-#   Iapd::Database.new.save_json_to_file(t.name)
-# end
-

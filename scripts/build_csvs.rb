@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+
 require 'pry'
 require 'csv'
 require 'zip'
-
 
 ZIP_FILE = './form-adv-complete-ria.zip'
 ADVISORS_FILE = './advisors.csv'
@@ -33,7 +33,7 @@ THREE_QUOTES = '"""'
 
 def quote(str)
   str
-    .gsub('|', '')
+    .delete('|')
     .gsub(BLANK_COLUMN, '')
     .gsub(COLUMN_IN_QUOTES, ',"""\2""",')
     .gsub(QUOTE_ALONE, TWO_QUOTES)
@@ -57,7 +57,7 @@ ADVISORS_HEADER_MAP = {
   '5F2F' => 'total_number_of_accounts',
   'FILINGID' => 'filing_id',
   'DATESUBMITTED' => 'date_submitted'
-}
+}.freeze
 
 OWNERS_HEADER_MAP = {
   'FILINGID' => 'filing_id',
@@ -72,17 +72,18 @@ OWNERS_HEADER_MAP = {
   'CONTROL PERSON' => 'control_person',
   'PR' => 'public_reporting',
   'OWNERID' => 'owner_id'
-}
+}.freeze
 
 # Oh encoding issues; they never seem to away.
 # I *think* the CSVs inside the zipfile are encoding with ISO_8859_1, but
 # in any case, this bit of ruby magic seems to do the trick.
 def normalize(line)
-  l = line
-          .force_encoding(Encoding::ISO_8859_1)
-          .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '')
-          .strip
-  quote(l)
+  quote(
+    line
+      .force_encoding(Encoding::ISO_8859_1)
+      .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '')
+      .strip
+  )
 end
 
 def parse_file(zip_file, out_file:, headers_map:, filter:)
@@ -95,7 +96,7 @@ def parse_file(zip_file, out_file:, headers_map:, filter:)
 
       stream = entry.get_input_stream
       headers = CSV.parse_line(stream.readline.strip)
-      
+
       col_count = headers_map.values.uniq.length + 1
 
       stream.each_line do |line|
