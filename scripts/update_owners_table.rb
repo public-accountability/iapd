@@ -24,7 +24,6 @@ end
 
 IAPD.with_database do |db|
   total_count = db.execute("SELECT COUNT(*) as count from owners")[0]['count'].to_f
-  display_when_eql_to_these_numbers = (0..total_count).filter { |i| (i % 500).zero? }
   current_count = 0
 
   db.execute("SELECT *, rowid FROM owners").each do |row|
@@ -37,7 +36,7 @@ IAPD.with_database do |db|
     db.execute(update_sql, values)
 
     current_count += 1
-    if display_when_eql_to_these_numbers.include?(current_count)
+    if (current_count % 500).zero?
       current_pct = ((current_count / total_count) * 100).round(2).to_s
       print "#{current_pct}%\r"
       $stdout.flush
