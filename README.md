@@ -1,5 +1,8 @@
 # IAPD
 
+**install gems:** ` gem install rubyzip sqlite3 `
+
+
 ``` shell
 rake download
 ```

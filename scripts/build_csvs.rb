@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'pry'
 require 'csv'
 require 'zip'
 
@@ -74,9 +73,10 @@ OWNERS_HEADER_MAP = {
   'OWNERID' => 'owner_id'
 }.freeze
 
-# Oh encoding issues; they never seem to away.
-# I *think* the CSVs inside the zipfile are encoding with ISO_8859_1, but
-# in any case, this bit of ruby magic seems to do the trick.
+# Oh encoding issues, they never seem to go away.
+# It appears that the CSVs inside the zipfile are encoded with ISO_8859_1,
+# and need to be converted into UTF-8.
+# In any case, this bit of ruby magic seems to do the trick
 def normalize(line)
   quote(
     line
@@ -87,7 +87,7 @@ def normalize(line)
 end
 
 def parse_file(zip_file, out_file:, headers_map:, filter:)
-  CSV.open(out_file, 'wb',  col_sep: '|') do |csv|
+  CSV.open(out_file, 'wb', col_sep: '|') do |csv|
     csv << (headers_map.values.uniq + ['filename'])
 
     zip_file.entries.filter(&AFTER_2016).filter(&filter).each do |entry|
@@ -102,14 +102,15 @@ def parse_file(zip_file, out_file:, headers_map:, filter:)
       stream.each_line do |line|
         parsed_line = CSV.parse_line(normalize(line), headers: headers)
         values = parsed_line
-                   .to_h
-                   .transform_keys(&:upcase)
-                   .slice(*headers_map.keys)
-                   .merge('filename' => filename)
-                   .values
+                 .to_h
+                 .transform_keys(&:upcase)
+                 .slice(*headers_map.keys)
+                 .merge('filename' => filename)
+                 .values
 
         if values.count != col_count
-          binding.pry
+          # binding.pry
+          raise "Wrong number of columns in:\n #{line}\n"
         else
           csv << values
         end
