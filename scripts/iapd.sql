@@ -31,6 +31,10 @@ CREATE TABLE owners (
 .import advisors.csv advisors
 .import owners.csv owners
 
+-- delete header rows
+DELETE FROM advisors WHERE name = 'name' AND dba_name = 'dba_name';
+DELETE FROM owners WHERE name = 'name' AND owner_type = 'owner_type';
+
 CREATE index owners_filing_id_idx on owners(filing_id);
 CREATE index advisors_filing_id_idx on advisors(filing_id);
 CREATE index advisors_assets_idx on advisors(assets_under_management);

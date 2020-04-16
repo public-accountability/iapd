@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'pry'
 require_relative 'iapd.rb'
 
 def create_column(name, type)
@@ -40,7 +39,8 @@ IAPD.with_database do |db|
     current_count += 1
     if display_when_eql_to_these_numbers.include?(current_count)
       current_pct = ((current_count / total_count) * 100).round(2).to_s
-      puts "#{current_pct}%"
+      print "#{current_pct}%\r"
+      $stdout.flush
     end
   end
 end
