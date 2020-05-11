@@ -20,7 +20,7 @@ def filename_metadata(filename)
 
   year = basename.scan(/(?<=_)20[[:digit:]]{2}/).first || raise("Invalid filename: #{filename}")
 
-  unless period = basename.scan(/(?<=_)20[[:digit:]]{6}_20[[:digit:]]{6}/).first
+  unless (period = basename.scan(/(?<=_)20[[:digit:]]{6}_20[[:digit:]]{6}/).first)
     period = basename.scan(/(?<=_)20[[:digit:]]{6}/).first || raise("Could not find time range in #{basename}")
   end
 
@@ -50,6 +50,14 @@ Zip::File.open(ZIP_FILE) do |zip_file|
     path = directory.join(metadata.basename).to_s
 
     puts "Extracting #{path}"
-    entry.extract(path)
+
+    File.open(path, 'w', encoding: Encoding::UTF_8) do |file|
+      entry.get_input_stream.each_line do |line|
+        file.puts(line
+                    .strip
+                    .force_encoding(Encoding::ISO_8859_1)
+                    .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => ''))
+      end
+    end
   end
 end
