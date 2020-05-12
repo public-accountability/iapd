@@ -77,6 +77,7 @@ CREATE TABLE owners_schedule_a AS
 SELECT json_group_array(
         json_object('filing_id', filing_id,
                     'schedule', schedule,
+                    'scha_3', scha_3,
                     'name', name,
                     'owner_type', owner_type,
                     'title_or_status', title_or_status,
