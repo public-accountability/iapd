@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'csv'
+require 'pathname'
 
 DATA_DIR = Pathname.new(Dir.pwd).join('./data').freeze
 YEARS = (2016..2019).map(&:to_s).freeze

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# task :default => :csv
+task :default => %i[download extract csvs datdabase]
 
 desc 'downloads form adv complete zip file'
 task download: ['form-adv-complete-ria.zip']
@@ -9,8 +9,12 @@ file 'form-adv-complete-ria.zip' do |t|
   sh "curl -# -L https://www.sec.gov/foia/docs/adv/form-adv-complete-ria.zip > #{t.name}"
 end
 
+task :extract do
+  ruby './scripts/extract.rb'
+end
+
 task :csvs do
-  ruby './scripts/build_csvs.rb'
+  ruby './scripts/csvs.rb'
 end
 
 desc 'creates the iapd database'

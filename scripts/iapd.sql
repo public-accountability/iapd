@@ -7,7 +7,9 @@ CREATE TABLE advisors (
   total_number_of_accounts INTEGER,
   filing_id INTEGER,
   date_submitted TEXT,
-  filename TEXT
+  filename TEXT,
+  iapd_year TEXT,
+  iapd_quarter TEXT
 );
 
 CREATE TABLE owners (
@@ -23,7 +25,9 @@ CREATE TABLE owners (
   control_person BOOLEAN,
   public_reporting BOOLEAN,
   owner_id TEXT,
-  filename TEXT
+  filename TEXT,
+  iapd_year TEXT,
+  iapd_quarter TEXT
 );
 
 .mode csv
@@ -32,8 +36,8 @@ CREATE TABLE owners (
 .import owners.csv owners
 
 -- delete header rows
-DELETE FROM advisors WHERE name = 'name' AND dba_name = 'dba_name';
-DELETE FROM owners WHERE name = 'name' AND owner_type = 'owner_type';
+-- DELETE FROM advisors WHERE name = 'name' AND dba_name = 'dba_name';
+-- DELETE FROM owners WHERE name = 'name' AND owner_type = 'owner_type';
 
 CREATE index owners_filing_id_idx on owners(filing_id);
 CREATE index advisors_filing_id_idx on advisors(filing_id);
