@@ -43,9 +43,9 @@ CREATE TABLE advisors AS
 select *
 FROM (
 	SELECT crd_number,
-		json_array(distinct name) as names,
-		json_array(distinct filing_id) as filing_ids,
-		json_array(distinct sec_file_number) as sec_file_numbers
+		json_group_array(distinct name) as names,
+		json_group_array(distinct filing_id) as filing_ids,
+		json_group_array(distinct sec_file_number) as sec_file_numbers
 	FROM advisors_filings
 	GROUP BY crd_number
 ) AS advisors_grouped_by_crd
