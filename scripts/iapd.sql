@@ -96,7 +96,33 @@ FROM owners_relationships
 WHERE schedule = 'A'
 GROUP BY owner_key, advisor_crd_number;
 
+CREATE TABLE owners_schedule_b AS
+SELECT json_group_array(
+        json_object('filing_id', filing_id,
+                    'schedule', schedule,
+                    'scha_3', scha_3,
+                    'name', name,
+                    'owner_type', owner_type,
+                    'title_or_status', title_or_status,
+                    'entity_in_which', entity_in_which,
+                    'acquired', acquired,
+                    'ownership_code', ownership_code,
+                    'control_person', control_person,
+                    'public_reporting', public_reporting,
+                    'owner_id', owner_id,
+                    'filename', filename,
+                    'iapd_year', iapd_year)
+       ) AS records,
+       json_group_array(filing_id) as filing_ids,
+       owner_key,
+       advisor_crd_number
+FROM owners_relationships
+WHERE schedule = 'B'
+GROUP BY owner_key, advisor_crd_number;
+
+
 CREATE index advisors_crd_number_idx on advisors(crd_number);
 CREATE index owners_relationships_advisor_crd_number_idx on owners_relationships(advisor_crd_number);
 CREATE index owners_schedule_a_advisor_crd_number_idx on owners_schedule_a(advisor_crd_number);
 CREATE index owners_schedule_a_owner_key_idx on owners_schedule_a(owner_key);
+CREATE index owners_schedule_b_owner_key_idx on owners_schedule_b(owner_key);
