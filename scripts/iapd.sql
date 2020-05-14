@@ -40,7 +40,11 @@ DELETE FROM advisors_filings WHERE name = 'name' AND dba_name = 'dba_name';
 DELETE FROM owners_filings WHERE name = 'name' AND owner_type = 'owner_type';
 
 CREATE TABLE advisors AS
-select *
+select advisors_grouped_by_crd.*,
+       advisor_aggregate_stats.first_filename,
+       advisor_aggregate_stats.latest_filename,
+       advisor_aggregate_stats.latest_aum,
+       advisor_aggregate_stats.latest_filing_id
 FROM (
 	SELECT crd_number,
 		json_group_array(distinct name) as names,
@@ -64,7 +68,9 @@ INNER JOIN (
 CREATE TABLE owners_relationships AS
 SELECT owners_filings.*,
        advisors_filings.advisor_crd_number,
-       case when owner_id like 'XX%' OR owner_id = 'FOREIGN' then name else owner_id end as owner_key
+       CASE WHEN owner_id LIKE 'XX%'
+       OR owner_id IN ('FOREIGN', '#', '[TO COME]', '0', '00', '0000', '00000', '000000', '0000000', '00000000', '000000000', '00-00000','00-000000', '00-0000000', '000-00-000', '00-0000001', '1', '01', '001', '02', '002')
+       THEN name ELSE owner_id END AS owner_key
 FROM owners_filings
 INNER JOIN (
 	select filing_id, crd_number as advisor_crd_number
