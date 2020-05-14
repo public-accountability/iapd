@@ -44,7 +44,8 @@ select advisors_grouped_by_crd.*,
        advisor_aggregate_stats.first_filename,
        advisor_aggregate_stats.latest_filename,
        advisor_aggregate_stats.latest_aum,
-       advisor_aggregate_stats.latest_filing_id
+       advisor_aggregate_stats.latest_filing_id,
+       advisor_aggregate_stats.latest_date_submitted
 FROM (
 	SELECT crd_number,
 		json_group_array(distinct name) as names,
@@ -59,7 +60,8 @@ INNER JOIN (
 		first_value(filename) OVER filename_window AS first_filename,
 		last_value(filename) OVER filename_window AS latest_filename,
 		last_value(assets_under_management) OVER filename_window AS latest_aum,
-		last_value(filing_id) OVER filename_window AS latest_filing_id
+		last_value(filing_id) OVER filename_window AS latest_filing_id,
+                last_value(date_submitted) OVER filename_window AS latest_date_submitted
 	from advisors_filings
 	WINDOW filename_window AS (PARTITION by crd_number order by filename asc RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 ) AS advisor_aggregate_stats ON advisors_grouped_by_crd.crd_number = advisor_aggregate_stats.crd_number;
