@@ -4,7 +4,6 @@
 require 'zip'
 require 'fileutils'
 
-ZIP_FILE = './form-adv-complete-ria.zip'
 DATA_DIR = Pathname.new('./data').freeze
 
 FileUtils.mkdir_p DATA_DIR
@@ -40,22 +39,50 @@ def filename_metadata(filename)
   Metadata.new(basename, year, period, quarter, schedule)
 end
 
-Zip::File.open(ZIP_FILE) do |zip_file|
-  zip_file.entries.each do |entry|
+# Rake download gets us form-adv-complete-ria.zip
+# inside multiple zip files, including "FORM ADV COMPLETE RIA Jan 2001 to June 30, 2020.zip"
+# which gets extracted to form_adv_complete_ria_jan_2001_to_june_30_2020.zip
+def extract_inner_zip
+  Zip::File.open('./form-adv-complete-ria.zip') do |outer_zip_file|
+    entry = outer_zip_file.get_entry("FORM ADV COMPLETE RIA Jan 2001 to June 30, 2020.zip")
+    filename = entry.name.downcase.tr(' ', '_').tr(',', '')
+    entry.extract(filename) unless File.exist?(filename)
+  end
+end
+
+def loop_entries
+  Zip::File.open('./form_adv_complete_ria_jan_2001_to_june_30_2020.zip') do |zip_file|
+    zip_file.entries.each do |entry|
+      yield entry
+    end
+  end
+end
+
+def file_writer(entry)
+  proc do |file|
+    entry.get_input_stream.each_line do |line|
+      file.puts(line
+                  .strip
+                  .force_encoding(Encoding::ISO_8859_1)
+                  .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => ''))
+    end
+  end
+end
+
+def extract_files
+  loop_entries do |entry|
     metadata = filename_metadata(entry.name)
     directory = DATA_DIR.join(metadata.year).join("Q#{metadata.quarter}")
     FileUtils.mkdir_p directory
     path = directory.join(metadata.basename).to_s
-
     puts "Extracting #{path}"
-
-    File.open(path, 'w', encoding: Encoding::UTF_8) do |file|
-      entry.get_input_stream.each_line do |line|
-        file.puts(line
-                    .strip
-                    .force_encoding(Encoding::ISO_8859_1)
-                    .encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => ''))
-      end
-    end
+    File.open(path, 'w', encoding: Encoding::UTF_8, &file_writer(entry))
   end
 end
+
+def run
+  extract_inner_zip
+  extract_files
+end
+
+run

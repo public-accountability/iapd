@@ -5,7 +5,7 @@ require 'csv'
 require 'pathname'
 
 DATA_DIR = Pathname.new(Dir.pwd).join('./data').freeze
-YEARS = (2016..2019).map(&:to_s).freeze
+YEARS = (2016..2020).map(&:to_s).freeze
 QUARTERS = (1..4).map { |i| "Q#{i}" }.freeze
 
 ADVISORS_FILE = './advisors.csv'
@@ -48,6 +48,8 @@ def loop_files(filter = nil, &block)
   YEARS.each do |year|
     QUARTERS.each do |quarter|
       path = DATA_DIR.join(year).join(quarter)
+      next unless path.exist?
+
       Dir.each_child(path) do |file|
         if filter.nil? || filter.match?(file)
           block.call(year, quarter, path.join(file))
